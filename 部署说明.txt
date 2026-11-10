@@ -1,54 +1,20 @@
-CD：Paddle识别引擎与家谱程序
+Paddle GitHub 中文识别引擎 CH 更新
 
-一、分工
-家谱程序负责：打开原图/PDF、选区、裁剪、输入、校对及入库。
-GitHub Pages只部署一次识别引擎，不提供选图、裁剪、输入或编辑界面。
-家谱程序把裁剪图Blob交给隐藏的GitHub识别页；模型在用户浏览器运行，返回文字、置信度和坐标。
-OCR.space继续由现有Cloudflare Worker转发，保留原API密钥和接口。
-Paddle不能在Cloudflare Worker内直接进行这套浏览器WASM推理。
+现有地址：https://duan114.github.io/familytree-paddle-ocr/
 
-二、GitHub一次部署
-解压PaddleOCR_GitHub_Engine_20261110_CD.zip，将里面的index.html、PaddleOCRAdapter.js、PaddleOCRWorker.mjs、PaddleEnginePage.js及整个paddle-assets目录原样放进GitHub Pages发布目录。
-如果仓库配置Actions，提交源文件后等待原部署流程；如果从分支发布，提交到Pages所指定的发布目录。
-该index.html是后台引擎页，只显示加载状态，不让用户在此选择或裁剪图片。
-在家谱程序“OCR设置”中填入实际GitHub Pages识别页地址，再点“检查Paddle模型”。
-也可在OCR部署配置.js的paddleURL中统一填写，供新安装默认使用。没有仓库地址时不应虚构URL。
-后续家谱程序继续调用同一地址，不必每次随程序更新再部署GitHub；只有识别引擎或模型改变才需更新。
-不要用这个index.html覆盖完整家谱平台的根index.html；后者仍是平台首页。
+1. 解压 PaddleOCR_GitHub_Engine_20261110_CH.zip。
+2. 在 familytree-paddle-ocr 仓库根目录上传 index.html、PaddleOCRAdapter.js、PaddleOCRWorker.mjs、PaddleEnginePage.js，以及 paddle-assets 文件夹中的文件，覆盖同名文件。
+3. 大文件在 paddle-assets 文件夹中分批上传；每个单独文件均小于 GitHub 网页上传的25 MiB限制。不要把整个zip直接上传当作网站。
+4. Commit changes，等待 Pages 构建完成，刷新原地址（必要时 Ctrl+F5）。显示“中文识别引擎已就绪”即可；模型按识别请求中的字形和模型设置选择。
+5. 家谱程序也覆盖 CH 应用补丁或换用 CH 完整包，再刷新。GitHub地址无需改变。
+6. 不覆盖原来的英文识别仓库；Cloudflare Worker /api/ocr 和试验用裁剪页不用改。
 
-三、默认与备用
-OCR默认Paddle。在Main工具菜单、各OCR页的“OCR设置”，或原设置页中均可切换。
-GitHub地址留空时，使用完整包附带的本地Paddle模型，便于先试用。请通过“启动本地服务”打开，勿直接双击HTML。
-设置保存于当前浏览器，各同源页面共用；缓存按引擎和地址区分。
-“Paddle失败后自动改用OCR.space”默认不勾选，失败只提示，可手动切换后重试。
-主动勾选后，Paddle失败会调用在线备用，上传所选图片并消耗OCR.space额度。
-无需为本批修改重新部署现有OCR.space API Worker。
+模型：
+cht -> chinese_cht_PP-OCRv3_mobile_rec（独立繁体）
+chs -> ch_PP-OCRv3_mobile_rec（标准中文，简体优先，不保证只输出简体）
+mixed -> PP-OCRv5_mobile_rec（通用）
+设置选择“始终使用v5繁简通用模型”时，无论字形选择均明确使用v5。
 
-四、现有Cloudflare Worker
-FamilyTree目前使用的是Cloudflare Worker的/api/ocr接口，由其转发OCR.space；不是使用根目录index.html。
-Cloudflare首页的裁剪页面只是实验，不接入家谱流程，不需要为本次修改更换。
-现有/api/ocr、API密钥、语言参数与CORS逻辑保持不变，OCR.space仍可作为备用。
-新增Paddle走GitHub后台识别页，裁剪、输入和校对均在FamilyTree。
-本次只准备源文件与引擎部署包，没有修改或发布GitHub/Cloudflare线上项目。
+重要测试结果：专用模型能运行，但不一定更准确。在本次旧谱样张上，独立繁体v3明显弱于v5；如果旧谱识别变差，请在OCR设置切回v5通用模型。选择语言是识别前选权重，不做识别后的自动字形转换。
 
-五、模型与数据
-PP-OCRv5_mobile_det + PP-OCRv5_mobile_rec，统一支持简体、繁体、英文与竖排；不是示例中的en_PP-OCRv5_mobile_rec。
-SDK 0.4.2，ONNX Runtime 1.24.3，WASM单线程后台Worker；运行库与模型均在部署包内，无需公共CDN动态下载。
-模型首次加载需稍候。配置的GitHub地址应由自己部署或信任；图片通过浏览器postMessage传给该页，本引擎不会上传图片到服务器。
-竖排按从右到左、每列从上到下整理。字体、纸张破损、异体字、手写和清晰度都会影响准确率，仍需校对。
-180秒超时后终止或断开本次识别，不无限重试。
-消息兼容OCR_PING、OCR_READY、OCR_REQUEST、OCR_RESULT、OCR_ERROR；新增OCR_PROGRESS。
-OCR_REQUEST传入image:Blob、requestId，可传layout:'vertical'/'horizontal'。OCR_RESULT返回result.text、result.lines及result.items。
-
-六、实测
-2026-11-10，Chromium 141 CPU/WASM：清晰繁体竖排样张三列“田氏宗譜 / 始祖諱汝源 / 生於光緒三年”识别成功，模型就绪后约0.8秒。
-清晰横排样张冷加载约2.1秒，其中一处空白多识别一字；需要人工校对。
-这些是生成的清晰样张，不代表真实旧谱扫描件的准确率；尚未收到真实竖排旧谱原图作对照。
-自动化覆盖本地文章选区识别、引擎切换、不自动消耗在线额度、显式启用备用后的一次回退，以及跨来源GitHub引擎消息传输。
-OCR.space用桩测试路由，未消耗实际调用额度。
-
-七、同批界面修正
-取消额外“展开/收起成员信息”键；默认采用原右上角“缩小”状态，仍能用原键放大。
-文字树旧外围框取消；红蓝框只框姓名。
-名片树工具栏增加“名片尺寸”：宽160-600像素、最小高30-600像素；默认宽260，至少高60，内容多时自动加高。上下树分别保存，可恢复默认。
-原始样本库、用户库、公共库和空白模板均未改动。
+所有裁剪、选图与校对仍在家谱程序完成；GitHub页只负责浏览器内推理并返回文字/坐标。首次切换模型需要下载对应资产；图片不发往Paddle服务器。
