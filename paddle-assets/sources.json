@@ -10,7 +10,9 @@
     "ort-wasm-simd-threaded.mjs": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/ort-wasm-simd-threaded.mjs",
     "ort-wasm-simd-threaded.wasm": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/ort-wasm-simd-threaded.wasm",
     "det.tar": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_onnx_infer.tar",
-    "rec.tar": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_rec_onnx_infer.tar"
+    "rec.tar": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_rec_onnx_infer.tar",
+    "rec-cht.tar": "https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/chinese_cht_PP-OCRv3_rec_infer.tar",
+    "rec-chs.tar": "https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar"
   },
   "localSHA256": {
     "clipper.mjs": "ea26007cc0db2a2fe330cd6350807c1fec24056e929a8479cf1be1252c1422c0",
@@ -26,11 +28,39 @@
     "rec.tar": "f7e792bc836f36e7ef895ad47c426d75b0b75b1650caa6d63fe9418441ffba8c",
     "det.tar": "781056046c9ed77a15c94681605db6a0f62317c2e9cce6931c71da2478d4bc30",
     "js-yaml.mjs": "7fb26ce32207430eec2ecdc57e87b2ff04a0c061c8065fb043857e75d9a3b810",
-    "ort-wasm-simd-threaded.wasm": "be0e129949062ad50290ef94683fac8be5bb6156f709e030b7a5f1661a2f6c17"
+    "ort-wasm-simd-threaded.wasm": "be0e129949062ad50290ef94683fac8be5bb6156f709e030b7a5f1661a2f6c17",
+    "rec-cht.tar": "556e04763aa995bbb6146ee230b8f291556fcb5b975f63876f6ef1d2d8e36279",
+    "rec-chs.tar": "44a59e736ce448dd3fe50d3d55bffbaf5323f7e82bc7addc767e8bceaf19498b"
   },
   "sdkLocalModifications": [
     "relative dependency imports",
     "WASM-only pinned runtime",
     "OffscreenCanvas + matFromImageData"
-  ]
+  ],
+  "recognitionSelection": {
+    "cht": "chinese_cht_PP-OCRv3_mobile_rec",
+    "chs": "ch_PP-OCRv3_mobile_rec",
+    "mixed": "PP-OCRv5_mobile_rec",
+    "unifiedOverride": "PP-OCRv5_mobile_rec"
+  },
+  "conversions": {
+    "cht": {
+      "source": "https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/chinese_cht_PP-OCRv3_rec_infer.tar",
+      "dictionary": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/release/2.7/ppocr/utils/dict/chinese_cht_dict.txt",
+      "model": "chinese_cht_PP-OCRv3_mobile_rec",
+      "paddle2onnx": "1.3.1",
+      "paddlepaddle": "3.0.0",
+      "opset": 14,
+      "format": "USTAR: inference.onnx + inference.yml containing original dictionary; no model weight or output script changes"
+    },
+    "chs": {
+      "source": "https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar",
+      "dictionary": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/release/2.7/ppocr/utils/ppocr_keys_v1.txt",
+      "model": "ch_PP-OCRv3_mobile_rec",
+      "paddle2onnx": "1.3.1",
+      "paddlepaddle": "3.0.0",
+      "opset": 14,
+      "format": "USTAR: inference.onnx + inference.yml containing original dictionary; no model weight or output script changes"
+    }
+  }
 }
