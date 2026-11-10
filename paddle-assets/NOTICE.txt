@@ -1,0 +1,23 @@
+Bundled runtime and models for local PaddleOCR inference.
+
+PaddlePaddle/PaddleOCR, @paddleocr/paddleocr-js 0.4.2: Apache License 2.0.
+PP-OCRv5_mobile_det and PP-OCRv5_mobile_rec ONNX inference archives are from PaddlePaddle's official model CDN.
+ONNX Runtime Web 1.24.3: MIT License.
+OpenCV.js / @techstark/opencv-js 4.10.0-release.1: see included OpenCV license and upstream notices.
+js-yaml 4.2.0: MIT License.
+clipper-lib 6.4.2: Boost Software License 1.0 (upstream Clipper).
+
+Exact upstream asset URLs and SHA-256 values are recorded in sources.json.
+The JS SDK bundle has only these local compatibility changes:
+- Pinned ESM dependencies point to adjacent local files rather than public CDNs.
+- ONNX runtime uses the WASM-only 1.24.3 bundle and matching WASM resources.
+- Canvas creation supports OffscreenCanvas; pixel transfer uses matFromImageData so inference works in our dedicated browser Worker.
+Model weights and dictionaries are unmodified. No API credentials are embedded.
+
+Official documentation:
+https://www.paddleocr.ai/latest/en/version3.x/inference_deployment/cross_platform/browser.html
+https://github.com/PaddlePaddle/PaddleOCR/tree/main/paddleocr-js
+https://github.com/microsoft/onnxruntime
+https://github.com/TechStark/opencv-js
+https://github.com/junmer/clipper-lib
+https://github.com/nodeca/js-yaml
